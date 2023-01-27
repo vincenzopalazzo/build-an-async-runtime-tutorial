@@ -1,14 +1,10 @@
-pub fn add(left: usize, right: usize) -> usize {
-    left + right
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
-}
+//! Custom rio a reproduction in a live of
+//! my experimental runtime RIO
+//! that lives https://github.com/vincenzopalazzo/rio/tree/main/rt/src
+//!
+//! author: Vincenzo Palazzo <vincenzopalazzodev@gmail.com>
+#![feature(once_cell)]
+pub mod runtime;
+mod runtime_impl;
+pub mod task;
+pub use runtime_impl::CustomRio;

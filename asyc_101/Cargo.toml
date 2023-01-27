@@ -1,0 +1,11 @@
+[package]
+name = "asyc_101"
+version = "0.1.0"
+edition = "2021"
+
+
+[dependencies]
+surf = { version = "2.3.2", features = [ "h1-client" ] }
+custom_rio = { path = "../custom_rio" }
+log = "0.4"
+env_logger = "0.9.1"
