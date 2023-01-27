@@ -3,7 +3,7 @@ use crate::task::Task;
 use std::collections::LinkedList;
 use std::future::Future;
 use std::ops::Deref;
-use std::sync::atomic::AtomicUsize;
+use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::{Arc, LazyLock, Mutex};
 use std::task::Poll;
 
@@ -82,7 +82,8 @@ impl Runtime for CustomRio {
         CustomRio::get()
     }
 
-    fn block_on(&self, future: impl std::future::Future<Output = ()> + Send + 'static) {
-        self.spawn_blocking(future);
+    fn block_on(future: impl std::future::Future<Output = ()> + Send + 'static) {
+        CustomRio::get().spawn_blocking(future);
+        while CustomRio::get().size_queue.load(Ordering::Relaxed) > 0 {}
     }
 }

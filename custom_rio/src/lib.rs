@@ -7,4 +7,4 @@
 pub mod runtime;
 mod runtime_impl;
 pub mod task;
-use runtime_impl::CustomRio;
+pub use runtime_impl::CustomRio;

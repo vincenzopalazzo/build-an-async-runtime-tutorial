@@ -5,5 +5,5 @@ use std::future::Future;
 pub trait Runtime {
     fn new() -> &'static Self;
 
-    fn block_on(&self, future: impl Future<Output = ()> + Send + 'static);
+    fn block_on(future: impl Future<Output = ()> + Send + 'static);
 }
