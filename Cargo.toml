@@ -1,0 +1,7 @@
+[workspace]
+
+members = [
+        "custom_rio",
+        "rust_101",
+        "tutotrial_cli",
+]
