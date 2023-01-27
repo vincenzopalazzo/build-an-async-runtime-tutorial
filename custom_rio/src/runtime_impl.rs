@@ -1,12 +1,11 @@
 use crate::runtime::Runtime;
+use crate::task::Task;
 use std::collections::LinkedList;
 use std::future::Future;
 use std::ops::Deref;
 use std::sync::atomic::AtomicUsize;
 use std::sync::{Arc, LazyLock, Mutex};
 use std::task::Poll;
-
-type Task = ();
 
 // how we can improve it?
 pub(crate) type Queue = Arc<Mutex<LinkedList<Arc<Task>>>>;
@@ -36,7 +35,7 @@ impl CustomRio {
                 None => continue,
             };
 
-            let Poll::Ready(_) = task.poll();
+            if let Poll::Ready(_) = task.poll() {};
         });
     }
 
@@ -44,7 +43,7 @@ impl CustomRio {
         INSTANCE.deref()
     }
 
-    pub fn pop_front(&self) -> Option<Arc<Task>> {
+    pub(crate) fn pop_front(&self) -> Option<Arc<Task>> {
         self.task_queue.lock().unwrap().pop_front()
     }
 
@@ -52,7 +51,7 @@ impl CustomRio {
     /// actually create a new `Task` in our queue. It takes the `Future`,
     /// constructs a `Task` and then pushes it to the back of the queue.
     pub fn spawn(&self, future: impl Future<Output = ()> + Send + 'static) {
-        //self.inner_spawn(Task::new(false, future));
+        self.inner_spawn(Task::new(false, future));
     }
     /// This is the function that gets called by the `spawn_blocking` function to
     /// actually create a new `Task` in our queue. It takes the `Future`,
@@ -60,21 +59,21 @@ impl CustomRio {
     /// where the runtime will check if it should block and then block until
     /// this future completes.
     pub fn spawn_blocking(&self, future: impl Future<Output = ()> + Send + 'static) {
-        //self.inner_spawn_blocking(Task::new(true, future));
+        self.inner_spawn_blocking(Task::new(true, future));
     }
 
     /// This function just takes a `Task` and pushes it onto the queue. We use this
     /// both for spawning new `Task`s and to push old ones that get woken up
     /// back onto the queue.
     pub(crate) fn inner_spawn(&self, task: Arc<Task>) {
-        //self.task_queue.lock().unwrap().push_back(task);
+        self.task_queue.lock().unwrap().push_back(task);
     }
 
     /// This function takes a `Task` and pushes it to the front of the queue
     /// if it is meant to block. We use this both for spawning new blocking
     /// `Task`s and to push old ones that get woken up back onto the queue.
     pub(crate) fn inner_spawn_blocking(&self, task: Arc<Task>) {
-        //self.task_queue.lock().unwrap().push_front(task);
+        self.task_queue.lock().unwrap().push_front(task);
     }
 }
 
